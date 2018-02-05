@@ -42,6 +42,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    /*PAGINATION is for displaying how much record in one page.*/
+
+    protected static final int PAGINATION = 10;
 
     private RelativeLayout relativeLayout;
     private PopupWindow popupWindow;
@@ -130,6 +133,35 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                range += PAGINATION;
+                if (range < recordList.size() - PAGINATION) {
+                    next.setVisibility(View.VISIBLE);
+                    prev.setVisibility(View.VISIBLE);
+                } else if (range == recordList.size() - PAGINATION) {
+                    next.setVisibility(View.INVISIBLE);
+                } else if (range > recordList.size() - PAGINATION) {
+                    next.setVisibility(View.INVISIBLE);
+                }
+                setData();
+            }
+        });
+
+        prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                range -= PAGINATION;
+                if (range >= PAGINATION) {
+                    prev.setVisibility(View.VISIBLE);
+                    next.setVisibility(View.VISIBLE);
+                } else if (range < PAGINATION) {
+                    prev.setVisibility(View.INVISIBLE);
+                }
+                setData();
+            }
+        });
 
     }
 
@@ -173,56 +205,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
 
     private void setData() {
         List<RecordModel> subList = null;
-        if (recordList.size() < 10) {
+        if (recordList.size() < PAGINATION) {
             subList = new ArrayList<RecordModel>(recordList);
-        } else if(recordList.size()>10 && range<recordList.size()-10){
-            subList = new ArrayList<RecordModel>(recordList.subList(range, range + 10));
-        }
-        else if(recordList.size()>10 && range>recordList.size()-10){
-            int diff=recordList.size()-range;
+        } else if (recordList.size() > PAGINATION && range < recordList.size() - PAGINATION) {
+            subList = new ArrayList<RecordModel>(recordList.subList(range, range + PAGINATION));
+        } else if (recordList.size() > PAGINATION && range > recordList.size() - PAGINATION) {
+            int diff = recordList.size() - range;
             subList = new ArrayList<RecordModel>(recordList.subList(range, range + diff));
         }
-
 
         RecordAdapter recordAdapter = new RecordAdapter(subList, getApplicationContext());
         layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(recordAdapter);
-
-
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                range += 10;
-                if (range < recordList.size() - 10) {
-                    next.setVisibility(View.VISIBLE);
-                    prev.setVisibility(View.VISIBLE);
-                } else if (range == recordList.size() - 10) {
-                    next.setVisibility(View.INVISIBLE);
-                }else if(range>recordList.size()-10){
-                    next.setVisibility(View.INVISIBLE);
-                }
-                setData();
-            }
-        });
-
-        prev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                range -= 10;
-                if (range >=10) {
-                    prev.setVisibility(View.VISIBLE);
-                    next.setVisibility(View.VISIBLE);
-                } else if (range < 10) {
-                    prev.setVisibility(View.INVISIBLE);
-                }
-                setData();
-            }
-        });
-
     }
 }
